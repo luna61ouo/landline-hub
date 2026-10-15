@@ -1,0 +1,14 @@
+poll_method		epoll
+sip_listen		0.0.0.0:5062
+audio_source		aufile,/data/play.wav
+audio_player		aufile,/data/rec/heard.wav
+audio_alert		aufile,/data/play.wav
+module_path		/usr/lib/baresip/modules
+module			g711.so
+module			aufile.so
+module			sndfile.so
+module_app		account.so
+module_app		menu.so
+snd_path		/data/rec
+module_app		ctrl_tcp.so
+ctrl_tcp_listen		127.0.0.1:4444

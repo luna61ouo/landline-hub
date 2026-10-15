@@ -9,7 +9,13 @@ description = "Turn a home or office landline into a small phone system: forward
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+  "aiohttp>=3.9",
+  "audioop-lts; python_version >= '3.13'",
+]
+
+[project.scripts]
+landline-hub = "landline_hub.__main__:main"
 
 [tool.setuptools.packages.find]
 include = ["landline_hub*"]

@@ -1,0 +1,38 @@
+# landline-hub configuration.  Copy to config.toml and edit.
+
+[server]
+host = "127.0.0.1"          # put a reverse proxy / VPN in front if phones connect from outside
+port = 8910
+data_dir = "data"           # paired clients and call history
+max_call_sec = 3600
+
+[gateway]
+kind = "sip"                # "sip": the gateway forwards incoming calls as SIP right away
+                            # "ht813": Grandstream HT813 (ring detection via syslog, answer on demand)
+host = "192.168.1.20"       # gateway IP; only this address may send us SIP
+port = 5062                 # gateway SIP port (HT813 FXO port = 5062)
+inbound_sip_port = 5090     # where the gateway forwards incoming calls to
+rtp_ports = "40100-40199"
+
+[numbers]
+policy = "tw"               # number rules: tw = Taiwan
+
+[forward]
+mode = "direct"             # direct: the landline rings, paired phones ring, first to answer talks
+                            # pbx:    the hub answers, asks for an extension, rings the phones behind it
+ring_timeout = 60
+
+[pbx]                       # only used when mode = "pbx"
+prompts_dir = "prompts"     # greeting.wav, invalid.wav, transferring.wav, wait_or_operator.wav, no_answer.wav
+operator = "0"
+digit_timeout = 8
+ring_sec = 20
+max_wait_rounds = 2
+
+[[pbx.extensions]]
+ext = "0"
+devices = ["front-desk"]
+
+[[pbx.extensions]]
+ext = "101"
+devices = ["alex-phone"]
