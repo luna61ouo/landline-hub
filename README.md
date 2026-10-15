@@ -148,6 +148,10 @@ The first install from a computer may need a confirmation on the phone (some ven
 python3 -m unittest discover -s tests -t .     # standard library only
 ```
 
+## Authors
+
+Luke Liu & Luna Liu
+
 ## License
 
-MIT
+MIT — Copyright (c) 2026 Luke Liu. See [LICENSE](LICENSE).
