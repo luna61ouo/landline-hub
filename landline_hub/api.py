@@ -9,6 +9,7 @@
                                      text in:  {"type":"hangup"} | {"type":"clear"} | {"type":"dtmf","digits":"1"}
                                      text out: the same events as /v1/events for this call
   GET  /v1/status
+  GET  /v1/history                  last 50 calls
 """
 from __future__ import annotations
 
@@ -146,6 +147,17 @@ def build_app(hub: Hub, store: ClientStore) -> web.Application:
                 await ws.close()
         return ws
 
+    async def history(request):
+        need(request)
+        rows = []
+        if hub.calls_log.exists():
+            for line in hub.calls_log.read_text().splitlines()[-50:]:
+                try:
+                    rows.append(json.loads(line))
+                except ValueError:
+                    pass
+        return web.json_response(list(reversed(rows)))
+
     async def status(request):
         need(request)
         ls = hub.line_state
@@ -160,4 +172,5 @@ def build_app(hub: Hub, store: ClientStore) -> web.Application:
     app.router.add_post("/v1/calls/{cid}/hangup", hangup)
     app.router.add_get("/v1/calls/{cid}/media", media)
     app.router.add_get("/v1/status", status)
+    app.router.add_get("/v1/history", history)
     return app

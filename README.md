@@ -10,12 +10,28 @@ Turn a landline into a small phone system that reaches your mobile phone.
 
 Works with an FXO gateway (Grandstream HT813 tested). Optional AI calling: landline-agent.
 
+## Quick start (no hardware needed)
+
+```bash
+pip install -e .
+cp config.example.toml config.toml            # point [gateway].host at your LAN IP for the fake gateway
+tools/fakegw/run.sh start                      # Docker: a fake FXO gateway that answers and plays a tone
+landline-hub pair -c config.toml --name my-phone
+landline-hub serve -c config.toml
+python tools/try_client.py http://127.0.0.1:8910 - pair <code>
+python tools/try_client.py http://127.0.0.1:8910 <token> dial 0212345678 5
+```
+
+The Android app is in `android/` (`ANDROID_HOME=... ./build.sh`, no Gradle).
+Real hardware: see [docs/ht813-setup.md](docs/ht813-setup.md).
+
 ## Status
 
-- [x] Pure domain: numbers, incoming calls, auto-attendant, line ownership (`python -m unittest discover -s tests -t .`)
-- [ ] SIP + fake gateway
-- [ ] HT813 adapter + Android app
-- [ ] Auto-attendant on real hardware
+- [x] Domain: numbers, per-client permissions, incoming calls, auto-attendant, line ownership (unit tests)
+- [x] SIP client/server, answer detection, DTMF, client API, direct forwarding, auto-attendant (verified with the fake gateway)
+- [x] Grandstream HT813 adapter (verified in simulation)
+- [x] Android app: pairing, incoming calls, answer, dial out, keypad (builds; not yet run on a phone)
+- [ ] Run on a real HT813 and phone
 
 ## Safety
 
