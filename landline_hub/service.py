@@ -27,6 +27,9 @@ def new_id() -> str:
     return time.strftime("%m%d%H%M%S-") + secrets.token_hex(3)
 
 
+LIVE_MAX_QUEUE_SEC = 0.2      # a person's voice may lag the line by at most this much
+
+
 @dataclass
 class Session:
     call_id: str
@@ -260,7 +263,20 @@ class Hub:
                 for c in chunks:
                     s.sink(c)
 
-    def play(self, s: Session, pcm8: bytes) -> None:
+    def play(self, s: Session, pcm8: bytes, live: bool = False) -> None:
+        """Audio from a client to the far end.
+
+        live (a person on a phone): nothing is queued before the call is
+        connected, and a backlog is dropped rather than played late - a
+        person talking wants the delay of a telephone, not a queue.  Without
+        this, the seconds a call spends dialling piled up and every word
+        afterwards arrived that much later.  A voice model (not live) may
+        queue a whole sentence ahead on purpose."""
+        if live:
+            if s.state != "connected":
+                return
+            if s.line.queued_sec() > LIVE_MAX_QUEUE_SEC:
+                s.line.clear()
         s.line.play(pcm8)
 
     def press(self, s: Session, digits: str) -> None:

@@ -19,7 +19,10 @@ import json
 from aiohttp import WSMsgType, web
 
 from .clients import ClientStore
+from .domain.permissions import ClientRole
 from .service import Hub
+
+LIVE_MAX_FRAMES = 10          # line -> phone: at most 10 frames (200 ms) waiting for a person's phone
 
 
 def build_app(hub: Hub, store: ClientStore) -> web.Application:
@@ -90,9 +93,12 @@ def build_app(hub: Hub, store: ClientStore) -> web.Application:
         ws = web.WebSocketResponse(heartbeat=15, max_msg_size=1 << 20)
         await ws.prepare(request)
         loop = asyncio.get_running_loop()
-        out: asyncio.Queue = asyncio.Queue(maxsize=250)
+        live = c.role is ClientRole.HANDSET
+        out: asyncio.Queue = asyncio.Queue(maxsize=LIVE_MAX_FRAMES if live else 250)
 
         def sink(pcm: bytes) -> None:
+            if out.full() and live:          # a phone that fell behind: drop old audio, stay current
+                out.get_nowait()
             try:
                 out.put_nowait(pcm)
             except asyncio.QueueFull:
@@ -118,7 +124,7 @@ def build_app(hub: Hub, store: ClientStore) -> web.Application:
         async def up():
             async for msg in ws:
                 if msg.type == WSMsgType.BINARY:
-                    hub.play(s, msg.data)
+                    hub.play(s, msg.data, live)
                 elif msg.type == WSMsgType.TEXT:
                     try:
                         cmd = json.loads(msg.data)
