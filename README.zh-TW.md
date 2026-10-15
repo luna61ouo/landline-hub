@@ -4,9 +4,7 @@
 
 **把家裡或公司的市話，變成會響到手機上的小型電話總機。**
 
-[![介紹影片（前 10 秒）](docs/media/preview.gif)](https://github.com/luna61ouo/landline-hub/raw/main/docs/media/intro-30s.mp4)
-
-▶ **[看 30 秒介紹影片（有聲音）](https://github.com/luna61ouo/landline-hub/raw/main/docs/media/intro-30s.mp4)**（MP4，5 MB）
+https://github.com/user-attachments/assets/812fc9dc-bb64-444c-bcd6-c42b66932d2e
 
 - **來電轉到手機**：市話一響，你的手機跟著響，人在哪裡都能接。
 - **總機與分機**：系統先接起來、請對方按分機，再讓那支分機背後的手機響。公司分機可以就是員工的手機，在不在辦公室都接得到。
