@@ -18,7 +18,7 @@ Tested with a Grandstream HT813 gateway and Taiwanese phone numbers.
 
 ```
  landline ── FXO gateway ──SIP── landline-hub ──HTTPS / WebSocket── Android app (your phone)
- (wall jack)   (HT813)              │                               landline-agent (AI calls, optional)
+ (wall jack)   (HT813)              │                               landline-agent (optional)
                                     └─ call history, pairing,       your own program
                                        numbers & permissions
 ```
