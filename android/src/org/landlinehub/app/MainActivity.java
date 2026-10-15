@@ -84,9 +84,10 @@ public class MainActivity extends Activity {
         root.addView(line, new LinearLayout.LayoutParams(-1, 2));
         tabBar = new LinearLayout(this);
         tabBar.setBackgroundColor(Color.parseColor("#F7F7F7"));
-        tabBar.setPadding(0, 14, 0, 30);
+        tabBar.setPadding(0, 14, 0, 14);
         root.addView(tabBar, new LinearLayout.LayoutParams(-1, -2));
         setContentView(root);
+        UI.fitSystemBars(root);
         showTab(tab);
     }
 
@@ -118,7 +119,7 @@ public class MainActivity extends Activity {
         LinearLayout v = new LinearLayout(this);
         v.setOrientation(LinearLayout.VERTICAL);
         v.setGravity(Gravity.CENTER_HORIZONTAL);
-        v.setPadding(0, 70, 0, 30);
+        v.setPadding(0, 30, 0, 30);
 
         banner = label("", 14, "#FFFFFF");
         banner.setPadding(30, 18, 30, 18);
@@ -230,7 +231,7 @@ public class MainActivity extends Activity {
         ScrollView sv = new ScrollView(this);
         LinearLayout v = new LinearLayout(this);
         v.setOrientation(LinearLayout.VERTICAL);
-        v.setPadding(40, 90, 40, 40);
+        v.setPadding(40, 40, 40, 40);
         TextView h = label(T.s("history"), 30, INK);
         h.setTypeface(Typeface.DEFAULT_BOLD);
         h.setPadding(0, 0, 0, 24);
@@ -283,7 +284,7 @@ public class MainActivity extends Activity {
         ScrollView sv = new ScrollView(this);
         LinearLayout v = new LinearLayout(this);
         v.setOrientation(LinearLayout.VERTICAL);
-        v.setPadding(40, 90, 40, 40);
+        v.setPadding(40, 40, 40, 40);
         TextView h = label(T.s("tab_settings"), 30, INK);
         h.setTypeface(Typeface.DEFAULT_BOLD);
         v.addView(h);
@@ -309,7 +310,7 @@ public class MainActivity extends Activity {
         sv.setBackgroundColor(Color.parseColor("#F4F7F5"));
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setPadding(40, 90, 40, 40);
+        root.setPadding(40, 40, 40, 40);
         sv.addView(root);
         TextView title = label(T.s("app"), 26, "#1E3A2F");
         root.addView(title);
@@ -322,6 +323,7 @@ public class MainActivity extends Activity {
         go.setOnClickListener(x -> pair(url.getText().toString().trim(), code.getText().toString().trim()));
         root.addView(go);
         setContentView(sv);
+        UI.fitSystemBars(sv);
         content = null;
         pairingRoot = root;
     }

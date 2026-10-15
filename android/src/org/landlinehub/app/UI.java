@@ -3,7 +3,10 @@ package org.landlinehub.app;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.Insets;
 import android.view.Gravity;
+import android.view.View;
+import android.view.WindowInsets;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -28,5 +31,17 @@ final class UI {
         btn.setLayoutParams(lp);
         return btn;
     }
+    /** Android 15 draws apps edge to edge: pad the screen so nothing sits under the status bar
+     *  or the navigation buttons.  The view's own padding is kept and the bars are added to it. */
+    static void fitSystemBars(View v) {
+        final int l = v.getPaddingLeft(), t = v.getPaddingTop(), r = v.getPaddingRight(), b = v.getPaddingBottom();
+        v.setOnApplyWindowInsetsListener((view, ins) -> {
+            Insets i = ins.getInsets(WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout());
+            view.setPadding(l + i.left, t + i.top, r + i.right, b + i.bottom);
+            return ins;
+        });
+        v.requestApplyInsets();
+    }
+
     private UI() {}
 }

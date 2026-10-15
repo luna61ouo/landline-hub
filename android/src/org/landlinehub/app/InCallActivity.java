@@ -76,6 +76,7 @@ public class InCallActivity extends Activity implements WsClient.Listener {
         hang.setOnClickListener(v -> hangup());
         root.addView(keys); root.addView(speaker); root.addView(hang);
         setContentView(root);
+        UI.fitSystemBars(root);
 
         new Thread(() -> start(answer, dial), "incall").start();
     }

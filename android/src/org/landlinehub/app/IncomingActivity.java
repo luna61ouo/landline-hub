@@ -44,6 +44,7 @@ public class IncomingActivity extends Activity {
         close.setOnClickListener(v -> { Ringer.mute(this); finish(); });
         root.addView(pick); root.addView(mute); root.addView(close);
         setContentView(root);
+        UI.fitSystemBars(root);
     }
 
     @Override protected void onResume() {
