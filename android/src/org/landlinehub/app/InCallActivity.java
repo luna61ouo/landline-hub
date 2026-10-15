@@ -11,6 +11,7 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PowerManager;
 import android.os.SystemClock;
 import android.view.Gravity;
 import android.view.View;
@@ -36,6 +37,7 @@ public class InCallActivity extends Activity implements WsClient.Listener {
     private AudioTrack track;
     private AudioManager am;
     private long connectedAt;
+    private PowerManager.WakeLock proximity;   // screen off while the phone is at the ear (earpiece mode)
 
     @Override protected void onCreate(Bundle b) {
         super.onCreate(b);
@@ -43,6 +45,9 @@ public class InCallActivity extends Activity implements WsClient.Listener {
         setShowWhenLocked(true);
         setTurnScreenOn(true);
         am = getSystemService(AudioManager.class);
+        PowerManager pm = getSystemService(PowerManager.class);
+        if (pm.isWakeLockLevelSupported(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK))
+            proximity = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "landline:incall");
         Ringer.stop(this);
         String answer = getIntent().getStringExtra("answer");
         String dial = getIntent().getStringExtra("dial");
@@ -151,6 +156,7 @@ public class InCallActivity extends Activity implements WsClient.Listener {
         track.play();
         rec.startRecording();
         talking = true;
+        updateProximity();
         connectedAt = SystemClock.elapsedRealtime();
         main.post(this::tick);
         new Thread(() -> {
@@ -184,6 +190,16 @@ public class InCallActivity extends Activity implements WsClient.Listener {
         boolean on = !am.isSpeakerphoneOn();
         am.setSpeakerphoneOn(on);
         speaker.setText(on ? T.s("speaker_on") : T.s("speaker_off"));
+        updateProximity();
+    }
+
+    /** Earpiece: the proximity sensor turns the screen off at the ear, so a cheek cannot press
+     *  anything.  Speaker on: the phone is not at the ear, keep the screen usable. */
+    private void updateProximity() {
+        if (proximity == null) return;
+        boolean want = talking && !finished && !am.isSpeakerphoneOn();
+        if (want && !proximity.isHeld()) proximity.acquire(4 * 60 * 60 * 1000L);
+        else if (!want && proximity.isHeld()) proximity.release(PowerManager.RELEASE_FLAG_WAIT_FOR_NO_PROXIMITY);
     }
 
     private void hangup() {
@@ -198,6 +214,7 @@ public class InCallActivity extends Activity implements WsClient.Listener {
         if (finished) return;
         finished = true;
         talking = false;
+        main.post(this::updateProximity);
         try { if (rec != null) { rec.stop(); rec.release(); } } catch (Exception ignored) {}
         try { if (track != null) { track.stop(); track.release(); } } catch (Exception ignored) {}
         am.setSpeakerphoneOn(false);

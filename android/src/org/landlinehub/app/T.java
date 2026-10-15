@@ -52,6 +52,11 @@ final class T {
         add("r_out", "Outgoing", "撥出");
         add("r_missed", "missed", "未接");
         add("unpair", "Unpair", "解除配對");
+        add("tab_recents", "Recents", "最近通話");
+        add("tab_keypad", "Keypad", "撥號鍵盤");
+        add("tab_settings", "Settings", "設定");
+        add("delete", "Delete", "刪除");
+        add("banner_perm", "Some permissions are missing — tap to fix", "有權限沒開，點這裡處理");
     }
     private static void add(String k, String en, String zh) { M.put(k, new String[]{en, zh}); }
     private static boolean zh() { return Locale.getDefault().getLanguage().equals("zh"); }
