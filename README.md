@@ -8,7 +8,7 @@
 - **Forward calls to your phone** – the landline rings, your phone rings, answer from anywhere.
 - **Auto-attendant** – the hub picks up, asks for an extension, and rings the phone(s) behind it. Office extensions that live on employees' mobiles, inside or outside the office.
 - **Dial out through the landline from your phone** – the other side sees your landline number.
-- **Let programs use the line** – an AI that makes calls for you (**landline-agent** (sister repository)) is just another client of the hub. You don't need it to use the hub.
+- **Let programs use the line** – an AI that makes calls for you ([landline-agent](https://github.com/luna61ouo/landline-agent)) is just another client of the hub. You don't need it to use the hub.
 
 Tested with a Grandstream HT813 gateway and Taiwanese phone numbers.
 
@@ -32,7 +32,7 @@ The gateway turns the analog line into SIP. The hub is the only thing that talks
 ## Install
 
 ```bash
-git clone <this repository> landline-hub && cd landline-hub
+git clone https://github.com/luna61ouo/landline-hub && cd landline-hub
 python3 -m venv .venv && . .venv/bin/activate
 pip install -e .
 cp config.example.toml config.toml        # then edit [gateway]
