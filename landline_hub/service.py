@@ -107,6 +107,22 @@ class Hub:
         event = {"at": time.time(), **event}
         self.bus.publish(event, to)
 
+    def ringing_for(self, c: Client) -> list[dict]:
+        """Calls this client could answer right now.  Sent when a phone
+        (re)connects, so a phone that was offline when the ringing started
+        still shows the call."""
+        out = []
+        for s in self.sessions.values():
+            if s.state != "ringing" or s.direction != "inbound" or c.role is not ClientRole.HANDSET:
+                continue
+            if s.pbx is not None and c.client_id not in s.ring_targets:
+                continue
+            ev = {"type": "incoming", "call_id": s.call_id, "number": s.number, "at": time.time()}
+            if s.pbx is not None:
+                ev["extension"] = True
+            out.append(ev)
+        return out
+
     def _record(self, s: Session) -> None:
         with self.calls_log.open("a") as f:
             f.write(json.dumps({"call_id": s.call_id, "direction": s.direction, "number": s.number,

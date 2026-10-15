@@ -50,6 +50,8 @@ def build_app(hub: Hub, store: ClientStore) -> web.Application:
         key, q = hub.bus.subscribe(c)
         try:
             await resp.write(b": hello\n\n")
+            for ev in hub.ringing_for(c):
+                await resp.write(f"data: {json.dumps(ev, ensure_ascii=False)}\n\n".encode())
             while True:
                 try:
                     ev = await asyncio.wait_for(q.get(), timeout=15)
