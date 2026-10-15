@@ -3,7 +3,9 @@
 **Turn the landline at your home or office into a small phone system that reaches your mobile phone.**
 把家裡或公司的市話，變成會響到手機上的小型電話總機。
 
-[![Intro video (30 s)](docs/media/intro.jpg)](docs/media/intro-30s.mp4)
+[![Intro (first 10 seconds)](docs/media/preview.gif)](https://github.com/luna61ouo/landline-hub/raw/main/docs/media/intro-30s.mp4)
+
+▶ **[Watch the 30-second intro with sound](https://github.com/luna61ouo/landline-hub/raw/main/docs/media/intro-30s.mp4)** (MP4, 5 MB) · 30 秒介紹影片（有聲音）
 
 - **Forward calls to your phone** – the landline rings, your phone rings, answer from anywhere.
 - **Auto-attendant** – the hub picks up, asks for an extension, and rings the phone(s) behind it. Office extensions that live on employees' mobiles, inside or outside the office.
