@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "landline-hub"
+version = "0.0.1"
+description = "Turn a home or office landline into a small phone system: forward calls to mobile phones, or run an auto-attendant that routes extensions to phones."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.setuptools.packages.find]
+include = ["landline_hub*"]
