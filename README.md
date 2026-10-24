@@ -109,7 +109,7 @@ The line belongs to one client at a time: a second call while the line is busy g
 
 All except pairing need `Authorization: Bearer <token>`.
 
-**Pick-up detection.** An analog line never says "the other side answered" – the gateway connects as soon as it has dialled. With `answer_detection: true` the hub listens to the ringback rhythm and holds the audio back until a person (or a machine) actually picks up, then sends `callee_answered {how, talking}`. The constants are tuned to Taiwan's ringback (1 s ring, 3 s pause).
+**Pick-up detection.** An analog line never says "the other side answered" – the gateway connects as soon as it has dialled. With `answer_detection: true` the hub listens to the ringback rhythm and holds the audio back until a person (or a machine) actually picks up, then sends `callee_answered {how, talking}`. When the pick-up was only inferred (the next ring did not come), the hub keeps listening for a few seconds; if the ringing comes back it closes again and sends `callee_not_answered`. The constants are tuned to Taiwan's ringback (1 s ring, 3 s pause; some exchanges ring 1.1 s and pause 1.9 s – both are handled).
 
 **Live audio for people.** For a person's phone the hub never queues audio: anything before the call connects is dropped and the backlog is capped at 200 ms, so a slow network costs a word, not a 10-second delay.
 

@@ -253,12 +253,18 @@ class Hub:
             except asyncio.TimeoutError:
                 continue
             chunks = [raw]
-            if s.gate and not s.gate.open:
+            if s.gate and (not s.gate.open or s.gate.verify_until is not None):
+                was_open, recalled = s.gate.open, s.gate.recalled
                 chunks = s.gate.feed(raw, time.monotonic() - t0)
+                if s.gate.recalled > recalled:
+                    # 10-24: the gate had opened on an inference and the ring came back
+                    self.emit({"type": "callee_not_answered", "call_id": s.call_id},
+                              lambda c, o=s.owner: c.client_id == o)
                 if chunks is None:
                     continue
-                self.emit({"type": "callee_answered", "call_id": s.call_id, "how": s.gate.reason,
-                           "talking": s.gate.voice_ms > 0}, lambda c, o=s.owner: c.client_id == o)
+                if not was_open:
+                    self.emit({"type": "callee_answered", "call_id": s.call_id, "how": s.gate.reason,
+                               "talking": s.gate.voice_ms > 0}, lambda c, o=s.owner: c.client_id == o)
             if s.sink:
                 for c in chunks:
                     s.sink(c)
