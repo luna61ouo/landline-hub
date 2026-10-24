@@ -109,7 +109,7 @@ landline-hub grant   -c config.toml 名稱 --kind emergency          # 見下表
 
 除了配對，其他都要帶 `Authorization: Bearer <token>`。
 
-**判斷對方接起來了沒。** 類比市話不會告訴你「對方接了」：閘道器一撥完號就算接通。設 `answer_detection: true` 時，hub 會聽回鈴音的節奏，在真人（或語音信箱）接起來之前先把聲音扣住，接起來才送出 `callee_answered {how, talking}`。如果只是推測接通（下一聲鈴沒來），hub 會再聽幾秒；鈴聲又響起就關回去，送出 `callee_not_answered`。這組參數是照台灣的回鈴音（響 1 秒、停 3 秒；有些交換機是響 1.1 秒、停 1.9 秒，兩種都認得）調的。
+**判斷對方接起來了沒。** 類比市話不會告訴你「對方接了」：閘道器一撥完號就算接通。設 `answer_detection: true` 時，hub 會聽回鈴音的節奏，在真人（或語音信箱）接起來之前先把聲音扣住，接起來才送出 `callee_answered {how, talking}`。如果只是推測接通（下一聲鈴沒來），hub 會再聽幾秒；鈴聲又響起就關回去，送出 `callee_not_answered`。想在自己的線路上驗證閘門，設 `[answer_detection] keep_audio = true`：hub 會存每通外撥到閘門下判斷為止的原始聲音（`keep_days` 天後刪除），`tools/gate_replay.py --exam` 會把標好答案的錄音重播給閘門考試。這組參數是照台灣的回鈴音（響 1 秒、停 3 秒；有些交換機是響 1.1 秒、停 1.9 秒，兩種都認得）調的。
 
 **真人講話不排隊。** 對人拿的手機，hub 不會讓聲音排隊：接通前的聲音直接丟掉，積壓最多 200 毫秒，所以網路慢時頂多漏一個字，不會整段晚 10 秒。
 

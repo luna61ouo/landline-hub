@@ -19,6 +19,7 @@ from .domain.number import DialNumber, Rejected
 from .domain.permissions import Client, ClientRole, may_dial
 from .line import dtmf
 from .line.answer_gate import AnswerGate
+from .line.gate_recorder import GateRecorder, prune as prune_gate_audio
 from .line.sip_uac import OutboundSip
 from .line.sip_uas import InboundSip, SipServer
 
@@ -41,6 +42,7 @@ class Session:
     state: str = "ringing"             # ringing | connected | ended
     answer_detection: bool = False
     gate: AnswerGate | None = None
+    gate_rec: GateRecorder | None = None
     sink: Callable[[bytes], None] | None = None     # who receives far-end audio right now
     attached: asyncio.Event = field(default_factory=asyncio.Event)
     ring_targets: frozenset[str] = frozenset()      # pbx: devices allowed to answer
@@ -158,8 +160,16 @@ class Hub:
         line = OutboundSip(g.host, g.port, g.user, g.password, log=lambda t, **f: self.log(t, call=call_id, **f))
         s = Session(call_id, "outbound", parsed.digits, line, client.client_id, answer_detection=answer_detection)
         if answer_detection:
-            s.gate = AnswerGate(log=lambda t, **f: self.emit({"type": "gate", "call_id": call_id, "what": t, **f},
-                                                              lambda c, o=client.client_id: c.client_id == o))
+            ad = self.cfg.extra.get("answer_detection", {})
+            rec = s.gate_rec = (GateRecorder(self.cfg.data_dir / "gate_audio", call_id)
+                                if ad.get("keep_audio") else None)
+
+            def gate_log(t, **f):
+                self.emit({"type": "gate", "call_id": call_id, "what": t, **f},
+                          lambda c, o=client.client_id: c.client_id == o)
+                if rec:
+                    rec.event(t, **f)
+            s.gate = AnswerGate(log=gate_log)
         self.sessions[call_id] = s
         asyncio.create_task(self._run_outbound(s))
         self.log("outbound", call=call_id, by=client.client_id, kind=parsed.kind.value)
@@ -253,6 +263,10 @@ class Hub:
             except asyncio.TimeoutError:
                 continue
             chunks = [raw]
+            if s.gate_rec and s.gate_rec.active:
+                s.gate_rec.feed(raw)
+                if s.gate and s.gate.open and s.gate.verify_until is None:
+                    s.gate_rec.settled()
             if s.gate and (not s.gate.open or s.gate.verify_until is not None):
                 was_open, recalled = s.gate.open, s.gate.recalled
                 chunks = s.gate.feed(raw, time.monotonic() - t0)
@@ -318,4 +332,12 @@ class Hub:
         self.release(f"call:{s.call_id}")
         self.sessions.pop(s.call_id, None)
         self._record(s)
+        if s.gate_rec:
+            try:
+                path = s.gate_rec.save(s.end_reason)
+                prune_gate_audio(self.cfg.data_dir / "gate_audio",
+                                 float(self.cfg.extra.get("answer_detection", {}).get("keep_days", 30)))
+                self.log("gate_audio_saved", call=s.call_id, path=str(path))
+            except Exception as e:  # pragma: no cover - never let a recording break the hang-up
+                self.log("gate_audio_error", call=s.call_id, err=repr(e))
         self.log("ended", call=s.call_id, reason=s.end_reason)
